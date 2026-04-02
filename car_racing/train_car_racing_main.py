@@ -77,8 +77,6 @@ def set_seed(seed):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-set_seed(args.seed)
-
 # ==========================================
 # 1. SEQUENCE REPLAY BUFFER
 # ==========================================
@@ -498,6 +496,8 @@ LEARNING_RATE = args.lr
 DIFFUSION_TIMESTEPS = args.diffusion_timesteps
 DDIM_INFERENCE_STEPS = args.ddim_steps
 
+set_seed(args.seed + global_rank)
+
 if global_rank == 0:
     print(f"Config: {IMG_H}x{IMG_W} | BS={BATCH_SIZE} | SeqLen={SEQ_LEN} | LR={LEARNING_RATE}")
     print(f"        Epochs={EPOCHS} | Steps/Epoch={STEPS_PER_EPOCH} | Diffusion T={DIFFUSION_TIMESTEPS}")
@@ -584,7 +584,7 @@ def collect_rollouts(env, agent, buffer, n_steps):
 # ==========================================
 # 7. AUTOREGRESSIVE EVALUATION LOOP (uses EMA model)
 # ==========================================
-def generate_autoregressive_video(ema_model, env, agent, device, num_frames=50, ddim_steps=50): 
+def generate_autoregressive_video(ema_model, env, agent, device, num_frames=100, ddim_steps=100): 
     ema_model.eval()
     val_img_losses = []
     val_pose_losses = []
